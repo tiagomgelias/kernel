@@ -147,24 +147,28 @@ class ModulesInstaller
    */
   function cleanUpModule ($moduleName)
   {
-    $io = $this->io;
-    $io->writeln ("Cleaning up <info>$moduleName</info>");
+    // Currently, only migration-related tasks are perfomed.
+
     $migrationsAPI = $this->getMigrationsAPI ();
-    $migrations    = $migrationsAPI->module ($moduleName)->status ();
-    if ($migrations) {
-      $io->nl ()->comment ("    The module has migrations.");
-      $migrations = array_findAll ($migrations, MigrationStruct::status, MigrationStruct::DONE);
+    if ($migrationsAPI) {
+      $io = $this->io;
+      $io->writeln ("Cleaning up <info>$moduleName</info>");
+      $migrations = $migrationsAPI->module ($moduleName)->status ();
       if ($migrations) {
-        $io->say ("    Updating the database...");
-        try {
-          $migrationsAPI->rollBack (0);
+        $io->nl ()->comment ("    The module has migrations.");
+        $migrations = array_findAll ($migrations, MigrationStruct::status, MigrationStruct::DONE);
+        if ($migrations) {
+          $io->say ("    Updating the database...");
+          try {
+            $migrationsAPI->rollBack (0);
+          }
+          catch (\Exception $e) {
+            $io->error ("Error while rolling back migrations: " . $e->getMessage ());
+          }
+          $io->say ("    <info>Done.</info>")->nl ();
         }
-        catch (\Exception $e) {
-          $io->error ("Error while rolling back migrations: " . $e->getMessage ());
-        }
-        $io->say ("    <info>Done.</info>")->nl ();
+        else $io->comment ("    No reverse migrations were run.")->nl ();
       }
-      else $io->comment ("    No reverse migrations were run.")->nl ();
     }
   }
 
