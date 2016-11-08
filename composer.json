@@ -1,0 +1,34 @@
+{
+  "name": "electro/kernel",
+  "description": "The core code of the Electro framework",
+  "license": "MIT",
+  "homepage": "https://github.com/electro/framework",
+  "authors": [
+    {
+      "name": "Impactwave",
+      "email": "impactwave@impactwave.com",
+      "homepage": "http://impactwave.com"
+    },
+    {
+      "name": "Cláudio Silva",
+      "email": "claudio.silva@impactwave.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "electro/installers": "^1.0.0",
+    "php-kit/composer-bower-plugin": "dev-master",
+    "php-kit/tools": "dev-master",
+    "php-kit/html5-tools": "dev-master",
+    "php-kit/power-primitives": "dev-master",
+    "php-kit/flow": "dev-master",
+    "electro/interop": "dev-master || 1.x-dev",
+    "rdlowrey/auryn": "^1.4.0",
+    "monolog/monolog": "^1.17.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Electro\\": "src"
+    }
+  }
+}
