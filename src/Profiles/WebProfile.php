@@ -43,7 +43,6 @@ class WebProfile implements ProfileInterface
   {
     return [
       'subsystems/authentication',
-      'subsystems/authorization',
       'subsystems/caching',
       'subsystems/configuration',
       'subsystems/database',
@@ -52,6 +51,7 @@ class WebProfile implements ProfileInterface
       'subsystems/content-server',
       'subsystems/http',
       'subsystems/localization',
+      'subsystems/logging',
       'subsystems/mail',
       'subsystems/navigation',
       'subsystems/routing',

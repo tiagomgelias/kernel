@@ -9,6 +9,12 @@ use Electro\Kernel\Services\Kernel;
 use Electro\Kernel\Services\ModulesInstaller;
 use Electro\Kernel\Services\ModulesRegistry;
 
+/**
+ * The framework's kernel subsystem.
+ *
+ * <p>**Note:** this module can't, obviously, be booted by the kernel, so it does not implement `ModuleInterface`;
+ * it will be run directly by the bootloader, unlike all other modules, who are run by the kernel.
+ */
 class KernelModule
 {
   const TASK_RUNNER_NAME = 'workman';

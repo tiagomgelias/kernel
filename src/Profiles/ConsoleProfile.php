@@ -47,6 +47,7 @@ class ConsoleProfile implements ProfileInterface
       'subsystems/console',
       'subsystems/database',
       'subsystems/localization',
+      'subsystems/logging',
       'subsystems/mail',
       'subsystems/tasks',
       'subsystems/validation',
