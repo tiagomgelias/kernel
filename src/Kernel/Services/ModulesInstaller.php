@@ -367,7 +367,7 @@ class ModulesInstaller
         if ($rp != "{$this->kernelSettings->baseDirectory}/$module->path")
           $module->realPath = $rp;
 
-        $module->dependencies = array_diff (object_propNames ($composerJson->get ('require')), ['php']);
+        $module->dependencies = array_diff (object_propNames ($composerJson->get ('require') ?: (object)[]), ['php']);
       }
     }
   }
