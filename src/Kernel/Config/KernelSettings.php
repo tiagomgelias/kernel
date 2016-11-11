@@ -25,10 +25,6 @@ class KernelSettings
    */
   public $baseURI;
   /**
-   * @var bool The value set on the .env file for the DEBUG variable.
-   */
-  public $debugMode = false;
-  /**
    * Favorite icon URL. This is read from templates.
    *
    * @var string

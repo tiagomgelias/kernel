@@ -44,6 +44,11 @@ class Kernel implements KernelInterface
 {
   use EventEmitterTrait;
 
+  /**
+   * @var bool|null The value set on the .env file for the DEBUG variable. When null, reading {@see getDebugMode} will
+   *                set it to the correct value.
+   */
+  private $debugMode = null;
   /** @var int */
   private $exitCode = 0;
   /**
@@ -96,6 +101,11 @@ class Kernel implements KernelInterface
     $this->emitAndInject (RECONFIGURE);
     $this->emitAndInject (RUN);
     $this->emitAndInject (SHUTDOWN);
+  }
+
+  function isDevEnv ()
+  {
+    return is_null ($this->debugMode) ? $this->debugMode = getenv ('DEBUG') == 'true' : $this->debugMode;
   }
 
   /**
