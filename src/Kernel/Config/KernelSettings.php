@@ -25,6 +25,14 @@ class KernelSettings
    */
   public $baseURI;
   /**
+   * The virtual URL for an HTTP request for opening a source file on an editor at the error location.
+   *
+   * <p>Example: `'edit-source'` for generating `'edit-source?file=filename.php&line=8&col=1'`
+   *
+   * @var string
+   */
+  public $editorURL = 'edit-source';
+  /**
    * Favorite icon URL. This is read from templates.
    *
    * @var string
