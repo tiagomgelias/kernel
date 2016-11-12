@@ -43,12 +43,11 @@ const SHUTDOWN = 5;
 class Kernel implements KernelInterface
 {
   use EventEmitterTrait;
-
   /**
-   * @var bool|null The value set on the .env file for the DEBUG variable. When null, reading {@see getDebugMode} will
-   *                set it to the correct value.
+   * @var bool
    */
-  private $debugMode = null;
+  private $devEnv;
+
   /** @var int */
   private $exitCode = 0;
   /**
@@ -60,10 +59,11 @@ class Kernel implements KernelInterface
    */
   private $profile;
 
-  function __construct (InjectorInterface $injector, ProfileInterface $profile)
+  function __construct (InjectorInterface $injector, ProfileInterface $profile, $debugMode)
   {
     $this->injector = $injector;
     $this->profile  = $profile;
+    $this->devEnv = $debugMode;
   }
 
   function boot ()
@@ -103,11 +103,6 @@ class Kernel implements KernelInterface
     $this->emitAndInject (SHUTDOWN);
   }
 
-  function isDevEnv ()
-  {
-    return is_null ($this->debugMode) ? $this->debugMode = getenv ('DEBUG') == 'true' : $this->debugMode;
-  }
-
   /**
    * Gets the exit status code that will be returned to the operating system when the program ends.
    *
@@ -136,6 +131,11 @@ class Kernel implements KernelInterface
   function getProfile ()
   {
     return $this->profile;
+  }
+
+  function devEnv ()
+  {
+    return $this->devEnv;
   }
 
   function onConfigure (callable $handler)
