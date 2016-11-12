@@ -59,11 +59,11 @@ class Kernel implements KernelInterface
    */
   private $profile;
 
-  function __construct (InjectorInterface $injector, ProfileInterface $profile, $debugMode)
+  function __construct (InjectorInterface $injector, ProfileInterface $profile, $devEnv)
   {
     $this->injector = $injector;
     $this->profile  = $profile;
-    $this->devEnv = $debugMode;
+    $this->devEnv   = $devEnv;
   }
 
   function boot ()
@@ -103,6 +103,11 @@ class Kernel implements KernelInterface
     $this->emitAndInject (SHUTDOWN);
   }
 
+  function devEnv ()
+  {
+    return $this->devEnv;
+  }
+
   /**
    * Gets the exit status code that will be returned to the operating system when the program ends.
    *
@@ -131,11 +136,6 @@ class Kernel implements KernelInterface
   function getProfile ()
   {
     return $this->profile;
-  }
-
-  function devEnv ()
-  {
-    return $this->devEnv;
   }
 
   function onConfigure (callable $handler)
