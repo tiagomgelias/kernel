@@ -174,13 +174,14 @@ class PrimaryBootloader
     /*
      * Start Composer's autoloader.
      */
-    if ((@include "private/packages/autoload.php") === false) {
+    if (!file_exists ("private/packages/autoload.php")) {
       $msg = "<h3>Project not installed</h3>
 Please run <b><kbd>composer install</kbd></b> on the command line
 ";;
       echo defined ('STDIN') && !isset($_SERVER['REQUEST_METHOD']) ? preg_replace ('/<.*?>/', '', $msg) : $msg;
       exit (1);
     }
+    include "private/packages/autoload.php";
     return $this;
   }
 
