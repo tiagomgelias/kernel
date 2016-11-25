@@ -93,6 +93,7 @@ class ModuleInfo implements AssignableInterface
    * @var string
    */
   public $type;
+
   /**
    * @var ComposerConfigHandler Caches the module's Composer configuration.
    */

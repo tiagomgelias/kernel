@@ -25,6 +25,11 @@ class ConsoleProfile implements ProfileInterface
     return [];
   }
 
+  public function getIncludedModules ()
+  {
+    return [];
+  }
+
   public function getInjector ()
   {
     return new Injector;
@@ -38,20 +43,6 @@ class ConsoleProfile implements ProfileInterface
   public function getName ()
   {
     return str_segmentsLast (static::class, '\\');
-  }
-
-  public function getSubsystems ()
-  {
-    return [
-      'subsystems/configuration',
-      'subsystems/console',
-      'subsystems/database',
-      'subsystems/localization',
-      'subsystems/logging',
-      'subsystems/mail',
-      'subsystems/tasks',
-      'subsystems/validation',
-    ];
   }
 
 }

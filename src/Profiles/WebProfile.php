@@ -24,6 +24,11 @@ class WebProfile implements ProfileInterface
     return [];
   }
 
+  public function getIncludedModules ()
+  {
+    return [];
+  }
+
   public function getInjector ()
   {
     return new Injector;
@@ -37,29 +42,6 @@ class WebProfile implements ProfileInterface
   public function getName ()
   {
     return str_segmentsLast (static::class, '\\');
-  }
-
-  public function getSubsystems ()
-  {
-    return [
-      'subsystems/authentication',
-      'subsystems/caching',
-      'subsystems/configuration',
-      'subsystems/database',
-      'subsystems/debugging',
-      'subsystems/error-handling',
-      'subsystems/content-server',
-      'subsystems/http',
-      'subsystems/localization',
-      'subsystems/logging',
-      'subsystems/mail',
-      'subsystems/navigation',
-      'subsystems/routing',
-      'subsystems/sessions',
-      'subsystems/validation',
-      'subsystems/view-engine',
-      'subsystems/web-server',
-    ];
   }
 
 }

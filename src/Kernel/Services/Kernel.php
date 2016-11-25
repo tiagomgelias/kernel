@@ -69,30 +69,53 @@ class Kernel implements KernelInterface
   function boot ()
   {
     /*
-     * Load all remaining modules, allowing them to subscribe to bootstrap events.
+     * Load all botable modules, allowing them to subscribe to lifecycle events.
      */
-    $exclude    = array_flip ($this->profile->getExcludedModules ());
-    $subsystems = array_flip ($this->profile->getSubsystems ());
+    $exclude = array_flip ($this->profile->getExcludedModules ());
+    $include = array_flip ($this->profile->getIncludedModules ());
 
     /** @var ModulesRegistry $registry */
     $registry = $this->injector->make (ModulesRegistry::class);
 
     foreach ($registry->onlyBootable ()->onlyEnabled ()->getModules () as $name => $module) {
       /** @var ModuleInfo $module */
-      if (isset ($exclude[$module->name]) ||
-          ($module->type == ModuleInfo::TYPE_SUBSYSTEM && !isset($subsystems[$module->name]))
-      ) continue;
-      $modBoot = $module->bootstrapper;
+
+      // Skip module if it's blacklisted.
+      if (isset ($exclude[$module->name]))
+        continue;
+
       /** @var ModuleInterface|string $modBoot */
-      if (!class_exists ($modBoot)) // don't load this module.
-        throw new ConfigException("Class $modBoot was not found.");
-      elseif (is_a ($modBoot, ModuleInterface::class, true))
+      $modBoot = $module->bootstrapper;
+
+      // Don't try to load modules that have no bootstraper class.
+      if (!$modBoot)
+        continue;
+
+      if (!class_exists ($modBoot))
+        throw new ConfigException("Class $modBoot was not found");
+
+      if (!is_a ($modBoot, ModuleInterface::class, true))
+        throw new ConfigException("Class $modBoot does not implement " . ModuleInterface::class);
+
+      // Boot module immediately if it's whitelisted.
+      if (isset($include[$module->name]))
         $modBoot::startUp ($this, $module);
-      //else ignore the module
+
+      // Boot the module only if it's compatible with the current profile.
+      else {
+        $compat = $modBoot::getCompatibleProfiles ();
+        foreach ($compat as $class)
+          if ($this->profile instanceof $class) {
+            $modBoot::startUp ($this, $module);
+            break;
+          }
+      }
+
+      // Loop to next module.
     }
 
     /**
-     * Boot up all non-core modules.
+     * Run the application lifecycle stages.
      */
 
     $this->emit (PRE_REGISTER, $this->injector);
