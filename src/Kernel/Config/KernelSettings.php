@@ -19,11 +19,11 @@ class KernelSettings
    */
   public $baseDirectory;
   /**
-   * The URI of current main application's root directory.
+   * The URL that matches the main application's root directory.
    *
    * @var string
    */
-  public $baseURI;
+  public $baseUrl;
   /**
    * The virtual URL for an HTTP request for opening a source file on an editor at the error location.
    *
@@ -31,7 +31,7 @@ class KernelSettings
    *
    * @var string
    */
-  public $editorURL = 'edit-source';
+  public $editorUrl = 'edit-source';
   /**
    * Favorite icon URL. This is read from templates.
    *
