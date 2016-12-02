@@ -151,7 +151,10 @@ class PrimaryBootloader
   /**
    * Sets up the application's bootstrapping environment.
    *
-   * <p>It loads the class autoloader and the `.env` file (if one exists).
+   * - It initializes global configuration options for the PHP execution environment (ex. current directory, some INI
+   * settings).
+   * - It loads the class autoloader and the `.env` file (if one exists).
+   *
    * <p>After calling this, you are free to reference any class on the application, or do any kind of operation prior
    * to calling {@see boot}(), which will continue the boot up sequence.
    *
@@ -164,6 +167,8 @@ class PrimaryBootloader
      * We need to make sure the current directory is the app's root so that all includes run flawlessly.
      */
     chdir ($this->root);
+
+    mb_internal_encoding ("UTF-8"); // override ini.default_charset
 
     /*
      * You may temporarily uncomment the following line for troubleshooting on restricted hosting environments.
