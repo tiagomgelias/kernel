@@ -76,8 +76,6 @@ class KernelSettings
   public $modulePublicPath = 'public';
   /**
    * The folder where the framework will search for your application-specific modules.
-   * <p>If a module is not found there, it will then search on `defaultModulesPath`.
-   * <p>Set by application.ini.php.
    *
    * @var String
    */
@@ -111,7 +109,6 @@ class KernelSettings
   /**
    * <p>The fallback folder name where the framework will search for modules.
    * <p>Plugin modules installed as Composer packages will be found there.
-   * <p>Set by application.ini.php.
    *
    * @var String
    */

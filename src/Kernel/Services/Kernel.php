@@ -92,10 +92,10 @@ class Kernel implements KernelInterface
         continue;
 
       if (!class_exists ($modBoot))
-        throw new ConfigException("Class $modBoot was not found");
+        throw new ConfigException("Class '$modBoot' from module '$module->name' was not found.", -1);
 
       if (!is_a ($modBoot, ModuleInterface::class, true))
-        throw new ConfigException("Class $modBoot does not implement " . ModuleInterface::class);
+        throw new ConfigException("Class '$modBoot' does not implement '" . ModuleInterface::class . "'.");
 
       // Boot module immediately if it's whitelisted.
       if (isset($include[$module->name]))

@@ -402,42 +402,58 @@ class ModulesInstaller
     return $modules;
   }
 
+  /**
+   * @return ModuleInfo[]
+   */
   private function scanPlugins ()
   {
-    return FilesystemFlow
-      ::from ("{$this->kernelSettings->baseDirectory}/{$this->kernelSettings->pluginModulesPath}")
-      ->onlyDirectories ()
-      ->expand (function (SplFileInfo $dirInfo) {
-        return FilesystemFlow
-          ::from ($dirInfo)
-          ->onlyDirectories ()
-          ->map (function (SplFileInfo $subDirInfo) use ($dirInfo) {
-            return (new ModuleInfo)->import ([
-              'name' => $dirInfo->getFilename () . '/' . $subDirInfo->getFilename (),
-              'path' => getRelativePathIfSubpath ($this->kernelSettings->baseDirectory, $subDirInfo->getPathname ()),
-            ]);
-          });
-      })
-      ->all ();
+    try {
+      return FilesystemFlow
+        ::from ("{$this->kernelSettings->baseDirectory}/{$this->kernelSettings->pluginModulesPath}")
+        ->onlyDirectories ()
+        ->expand (function (SplFileInfo $dirInfo) {
+          return FilesystemFlow
+            ::from ($dirInfo)
+            ->onlyDirectories ()
+            ->map (function (SplFileInfo $subDirInfo) use ($dirInfo) {
+              return (new ModuleInfo)->import ([
+                'name' => $dirInfo->getFilename () . '/' . $subDirInfo->getFilename (),
+                'path' => getRelativePathIfSubpath ($this->kernelSettings->baseDirectory, $subDirInfo->getPathname ()),
+              ]);
+            });
+        })
+        ->all ();
+    }
+    catch (\InvalidArgumentException $e) {
+      return [];
+    }
   }
 
+  /**
+   * @return ModuleInfo[]
+   */
   private function scanPrivateModules ()
   {
-    return FilesystemFlow
-      ::from ("{$this->kernelSettings->baseDirectory}/{$this->kernelSettings->modulesPath}")
-      ->onlyDirectories ()
-      ->expand (function (SplFileInfo $dirInfo) {
-        return FilesystemFlow
-          ::from ($dirInfo)
-          ->onlyDirectories ()
-          ->map (function (SplFileInfo $subDirInfo) use ($dirInfo) {
-            return (new ModuleInfo)->import ([
-              'name' => $dirInfo->getFilename () . '/' . $subDirInfo->getFilename (),
-              'path' => getRelativePathIfSubpath ($this->kernelSettings->baseDirectory, $subDirInfo->getPathname ()),
-            ]);
-          });
-      })
-      ->all ();
+    try {
+      return FilesystemFlow
+        ::from ("{$this->kernelSettings->baseDirectory}/{$this->kernelSettings->modulesPath}")
+        ->onlyDirectories ()
+        ->expand (function (SplFileInfo $dirInfo) {
+          return FilesystemFlow
+            ::from ($dirInfo)
+            ->onlyDirectories ()
+            ->map (function (SplFileInfo $subDirInfo) use ($dirInfo) {
+              return (new ModuleInfo)->import ([
+                'name' => $dirInfo->getFilename () . '/' . $subDirInfo->getFilename (),
+                'path' => getRelativePathIfSubpath ($this->kernelSettings->baseDirectory, $subDirInfo->getPathname ()),
+              ]);
+            });
+        })
+        ->all ();
+    }
+    catch (\InvalidArgumentException $e) {
+      return [];
+    }
   }
 
   /**
@@ -447,18 +463,23 @@ class ModulesInstaller
    */
   private function scanSubsystems ()
   {
-    return FilesystemFlow
-      ::from ("{$this->kernelSettings->frameworkPath}/subsystems")
-      ->onlyDirectories ()
-      ->map (function (SplFileInfo $dirInfo) {
-        $path = normalizePath ($dirInfo->getPathname ());
-        $p    = strpos ($path, 'framework/') + 9;
-        return (new ModuleInfo)->import ([
-          'name' => 'subsystems/' . $dirInfo->getFilename (),
-          'path' => KernelSettings::FRAMEWORK_PATH . substr ($path, $p),
-        ]);
-      })
-      ->pack ()->all ();
+    try {
+      return FilesystemFlow
+        ::from ("{$this->kernelSettings->frameworkPath}/subsystems")
+        ->onlyDirectories ()
+        ->map (function (SplFileInfo $dirInfo) {
+          $path = normalizePath ($dirInfo->getPathname ());
+          $p    = strpos ($path, 'framework/') + 9;
+          return (new ModuleInfo)->import ([
+            'name' => 'subsystems/' . $dirInfo->getFilename (),
+            'path' => KernelSettings::FRAMEWORK_PATH . substr ($path, $p),
+          ]);
+        })
+        ->pack ()->all ();
+    }
+    catch (\InvalidArgumentException $e) {
+      return [];
+    }
   }
 
   private function setupModules (array $modules)

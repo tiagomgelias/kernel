@@ -16,6 +16,8 @@ class ModulesRegistry
 {
   use InspectionTrait;
 
+  const REGISTRY_FILE = 'modules.json';
+
   static $INSPECTABLE = ['modules'];
   /**
    * @var KernelSettings
@@ -370,7 +372,7 @@ class ModulesRegistry
    */
   private function getRegistryPath ()
   {
-    return "{$this->kernelSettings->storagePath}/modules.json";
+    return "{$this->kernelSettings->storagePath}/" . self::REGISTRY_FILE;
   }
 
 }
