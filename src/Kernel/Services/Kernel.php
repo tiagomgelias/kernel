@@ -6,6 +6,7 @@ use Electro\Interfaces\DI\InjectorInterface;
 use Electro\Interfaces\KernelInterface;
 use Electro\Interfaces\ModuleInterface;
 use Electro\Interfaces\ProfileInterface;
+use Electro\Kernel\Config\KernelSettings;
 use Electro\Kernel\Lib\ModuleInfo;
 use Electro\Traits\EventEmitterTrait;
 
@@ -43,10 +44,6 @@ const SHUTDOWN = 5;
 class Kernel implements KernelInterface
 {
   use EventEmitterTrait;
-  /**
-   * @var bool
-   */
-  private $devEnv;
 
   /** @var int */
   private $exitCode = 0;
@@ -58,12 +55,16 @@ class Kernel implements KernelInterface
    * @var ProfileInterface
    */
   private $profile;
+  /**
+   * @var KernelSettings
+   */
+  private $settings;
 
-  function __construct (InjectorInterface $injector, ProfileInterface $profile, $devEnv)
+  function __construct (InjectorInterface $injector, ProfileInterface $profile, KernelSettings $settings)
   {
     $this->injector = $injector;
     $this->profile  = $profile;
-    $this->devEnv   = $devEnv;
+    $this->settings = $settings;
   }
 
   function boot ()
@@ -128,7 +129,7 @@ class Kernel implements KernelInterface
 
   function devEnv ()
   {
-    return $this->devEnv;
+    return $this->settings->devEnv;
   }
 
   /**
