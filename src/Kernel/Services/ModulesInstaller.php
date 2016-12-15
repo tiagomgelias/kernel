@@ -505,7 +505,7 @@ class ModulesInstaller
     $migrations    = $migrationsAPI->module ($module->name)->status ();
     if ($migrations) {
       $io = $this->io;
-      $io->comment ("    The module has migrations.");
+      $io->comment ("    Module <info>$module->name</info> has migrations.");
       $migrations = array_findAll ($migrations, MigrationStruct::status, MigrationStruct::PENDING);
       if ($migrations) {
         $io->say ("    Updating the database...");
