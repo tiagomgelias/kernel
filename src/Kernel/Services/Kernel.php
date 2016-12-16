@@ -45,19 +45,15 @@ class Kernel implements KernelInterface
 {
   use EventEmitterTrait;
 
+  /** @var bool */
+  private $devEnv;
   /** @var int */
   private $exitCode = 0;
-  /**
-   * @var InjectorInterface
-   */
+  /** @var InjectorInterface */
   private $injector;
-  /**
-   * @var ProfileInterface
-   */
+  /** @var ProfileInterface */
   private $profile;
-  /**
-   * @var KernelSettings
-   */
+  /** @var KernelSettings */
   private $settings;
 
   function __construct (InjectorInterface $injector, ProfileInterface $profile, KernelSettings $settings)
@@ -65,6 +61,7 @@ class Kernel implements KernelInterface
     $this->injector = $injector;
     $this->profile  = $profile;
     $this->settings = $settings;
+    $this->devEnv = env ('DEV', false);
   }
 
   function boot ()
@@ -129,7 +126,7 @@ class Kernel implements KernelInterface
 
   function devEnv ()
   {
-    return $this->settings->devEnv;
+    return $this->devEnv;
   }
 
   /**
