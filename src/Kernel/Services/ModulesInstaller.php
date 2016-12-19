@@ -102,14 +102,22 @@ class ModulesInstaller
       $A[$module->name] = $module;
       $module->tmp      = $module->requiredBy; // tmp is a temporary scratch list
     }
+
+    foreach ($modules as $module)
+      if ($module->priority) {
+        $L[] = [$module->priority, $module];
+      }
+
+    $L = array_getColumn (array_orderBy ($L, '0', SORT_DESC), 1);
+
     /** @var ModuleInfo[] $S Set of all modules not dependend upon */
     $S = filter ($modules, function (ModuleInfo $m) { return !$m->requiredBy; }, true);
     while ($S) {
       $n = array_pop ($S);
       array_unshift ($L, $n);
       foreach ($n->dependencies as $name) {
-        $m = $A[$name];
-        if (in_array ($n->name, $m->tmp)) {
+        $m = get ($A, $name);
+        if ($m && in_array ($n->name, $m->tmp)) {
           $m->tmp = array_diff ($m->tmp, [$n->name]);
           if (!$m->tmp)
             $S[] = $m;
@@ -117,7 +125,7 @@ class ModulesInstaller
       }
     }
     foreach ($modules as $m) {
-      if ($m->tmp)
+      if (isset($m->tmp) && $m->tmp)
         throw new ConfigException(sprintf ('Cyclic dependency between modules: "%s" <-> "%s"', $m->name,
           implode ('" <-> "', $m->tmp)));
       unset ($m->tmp);
@@ -368,6 +376,7 @@ class ModulesInstaller
           $module->realPath = $rp;
 
         $module->dependencies = array_diff (object_propNames ($composerJson->get ('require') ?: (object)[]), ['php']);
+        $module->priority     = $composerJson->get ('extra.boot-priority', 0);
       }
     }
   }

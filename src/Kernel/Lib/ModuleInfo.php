@@ -20,7 +20,7 @@ class ModuleInfo implements AssignableInterface
   const BOOTSTRAPPER_CLASS_NAME_FMT = 'Config\\%sModule';
   const KEEP_PROPS                  = ['enabled'];
   const TYPE_PLUGIN                 = 'plugin';
-  const TYPE_PRIORITY = [
+  const TYPE_PRIORITY               = [
     ModuleInfo::TYPE_SUBSYSTEM => 1,
     ModuleInfo::TYPE_PLUGIN    => 2,
     ModuleInfo::TYPE_PRIVATE   => 3,
@@ -39,12 +39,6 @@ class ModuleInfo implements AssignableInterface
    * @var string[]
    */
   public $dependencies = [];
-  /**
-   * List of names of modules that depend on this module.
-   *
-   * @var string[]
-   */
-  public $requiredBy = [];
   /**
    * An optional textual description (one line) of the module's purpose.
    *
@@ -78,6 +72,13 @@ class ModuleInfo implements AssignableInterface
    */
   public $path;
   /**
+   * If greater than 0, the module will always be loaded before all modules with lesser priority.
+   * <p>Beware that modules with priority set will be out of scope for topological sorting.
+   *
+   * @var int
+   */
+  public $priority = 0;
+  /**
    * If set, maps `$path` to the real filesystem path. This is useful when modules are symlinked and we want to display
    * debugging paths as short paths relative to the application's root directory.
    * <p>If the module is not symlinked, this value should be null to enhance performance and to allow deployment of
@@ -87,13 +88,18 @@ class ModuleInfo implements AssignableInterface
    */
   public $realPath;
   /**
+   * List of names of modules that depend on this module.
+   *
+   * @var string[]
+   */
+  public $requiredBy = [];
+  /**
    * The module type: plugin, subsystem or projectModule.
    * <p>One of the `self::TYPE` constants.
    *
    * @var string
    */
   public $type;
-
   /**
    * @var ComposerConfigHandler Caches the module's Composer configuration.
    */
