@@ -88,6 +88,30 @@ class ModulesInstaller
   }
 
   /**
+   * Brings modules with higer priority to the front of the list, keeping the same order as much as possible.
+   *
+   * @param ModuleInfo[]   $modules
+   * @return ModuleInfo[]
+   */
+  static private function modulesPrioritySort (array $modules)
+  {
+    $max = 0;
+    foreach ($modules as $l)
+      if ($l->priority > $max)
+        $max = $l->priority;
+
+    $o = [];
+    while ($max >= 0) {
+      foreach ($modules as $l)
+        if ($l->priority == $max)
+          $o[] = $l;
+      --$max;
+    }
+
+    return $o;
+  }
+
+  /**
    * @param ModuleInfo[] $modules
    * @return ModuleInfo[]
    * @throws ConfigException
@@ -102,13 +126,6 @@ class ModulesInstaller
       $A[$module->name] = $module;
       $module->tmp      = $module->requiredBy; // tmp is a temporary scratch list
     }
-
-    foreach ($modules as $module)
-      if ($module->priority) {
-        $L[] = [$module->priority, $module];
-      }
-
-    $L = array_getColumn (array_orderBy ($L, '0', SORT_DESC), 1);
 
     /** @var ModuleInfo[] $S Set of all modules not dependend upon */
     $S = filter ($modules, function (ModuleInfo $m) { return !$m->requiredBy; }, true);
@@ -130,6 +147,7 @@ class ModulesInstaller
           implode ('" <-> "', $m->tmp)));
       unset ($m->tmp);
     }
+
     return $L;
   }
 
@@ -146,6 +164,7 @@ class ModulesInstaller
     foreach ($types as &$t)
       $t = self::modulesTopologicalSort ($t);
     $modules = array_merge (...$types);
+    $modules = self::modulesPrioritySort ($modules);
   }
 
   /**
