@@ -158,9 +158,20 @@ class KernelSettings
   function getMainPathMap ()
   {
     $rp = realpath ($this->frameworkPath);
-    return $rp != $this->frameworkPath ? [
-      $rp => self::FRAMEWORK_PATH,
-    ] : [];
+
+    $o = [];
+    if ($rp != $this->frameworkPath)
+      $o[$rp] = self::FRAMEWORK_PATH;
+
+    //TODO: register all PHP-KIT packages.
+    $phpKit = 'private/packages/php-kit/php-web-console';
+    $oPath = "$this->baseDirectory/$phpKit";
+    $rPhpKit = realpath($oPath);
+
+    if ($rPhpKit != $oPath)
+      $o[$rPhpKit] = $phpKit;
+
+    return $o;
   }
 
   /**
