@@ -94,6 +94,10 @@ class KernelSettings
    */
   public $name = 'electro';
   /**
+   * @var string The path to the folder where Composer packages are installed.
+   */
+  public $packagesPath = 'private/packages';
+  /**
    * The URL parameter name used for pagination.
    *
    * @var string
@@ -164,9 +168,9 @@ class KernelSettings
       $o[$rp] = self::FRAMEWORK_PATH;
 
     //TODO: register all PHP-KIT packages.
-    $phpKit = 'private/packages/php-kit/php-web-console';
-    $oPath = "$this->baseDirectory/$phpKit";
-    $rPhpKit = realpath($oPath);
+    $phpKit  = 'private/packages/php-kit/php-web-console';
+    $oPath   = "$this->baseDirectory/$phpKit";
+    $rPhpKit = realpath ($oPath);
 
     if ($rPhpKit != $oPath)
       $o[$rPhpKit] = $phpKit;
