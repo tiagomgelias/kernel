@@ -19,6 +19,12 @@ class KernelSettings
    */
   public $baseDirectory;
   /**
+   * The URL path of current main application's base URL.
+   *
+   * @var string
+   */
+  public $basePath;
+  /**
    * The URL that matches the main application's root directory.
    *
    * @var string
