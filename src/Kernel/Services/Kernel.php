@@ -8,7 +8,7 @@ use Electro\Interfaces\ModuleInterface;
 use Electro\Interfaces\ProfileInterface;
 use Electro\Kernel\Config\KernelSettings;
 use Electro\Kernel\Lib\ModuleInfo;
-use Electro\Traits\EventEmitterTrait;
+use Electro\Traits\EventBroadcasterTrait;
 
 /**
  * Use this event for overriding core framework services.
@@ -43,7 +43,7 @@ const SHUTDOWN = 5;
  */
 class Kernel implements KernelInterface
 {
-  use EventEmitterTrait;
+  use EventBroadcasterTrait;
 
   /** @var bool */
   private $devEnv;
@@ -193,6 +193,7 @@ class Kernel implements KernelInterface
    * Emits an event to all handlers registered to that event (if any), injecting the arguments to each calling handler.
    *
    * @param string $event The event name.
+   * @throws \Auryn\InjectionException
    */
   protected function emitAndInject ($event)
   {
