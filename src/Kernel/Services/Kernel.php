@@ -43,7 +43,7 @@ const SHUTDOWN = 5;
  */
 class Kernel implements KernelInterface
 {
-  use EventBroadcasterTrait;
+  use EventBroadcasterTrait { emit as protected; }
 
   /** @var bool */
   private $devEnv;
