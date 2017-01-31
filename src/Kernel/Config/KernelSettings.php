@@ -1,4 +1,5 @@
 <?php
+
 namespace Electro\Kernel\Config;
 
 use Electro\Interfaces\DI\InjectorInterface;
@@ -208,6 +209,34 @@ class KernelSettings
       ? $rootDir . substr ($path, 1)       // replace the '.' directory by $rootDir
       : $rootDir . PATH_SEPARATOR . $path; // otherwise prepend $rootDir to the path
     set_include_path ($path);
+  }
+
+  /**
+   * Converts filesystem paths relative fron the application's base directory into absolute paths.
+   * <p>Absolute paths will be returned unmodified.
+   *
+   * @param string $path
+   * @return string
+   */
+  function toAbsolutePath ($path)
+  {
+    if ($path[0] == '/' || $path[0] == '\\')
+      return $path;
+    return $this->baseDirectory . DIRECTORY_SEPARATOR . $path;
+  }
+
+  /**
+   * Converts absolute filesystem paths to relative paths fron the application's base directory.
+   * <p>Relative paths will be returned unmodified.
+   *
+   * @param string $path
+   * @return string
+   */
+  function toRelativePath ($path)
+  {
+    if ($path[0] == '/' || $path[0] == '\\')
+      return substr ($path, strlen ($this->baseDirectory) + 1);
+    return $path;
   }
 
 }
