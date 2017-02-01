@@ -8,7 +8,7 @@ use Electro\Interfaces\ModuleInterface;
 use Electro\Interfaces\ProfileInterface;
 use Electro\Kernel\Config\KernelSettings;
 use Electro\Kernel\Lib\ModuleInfo;
-use Electro\Traits\EventBroadcasterTrait;
+use Electro\Traits\EventsTrait;
 
 /**
  * Use this event for overriding core framework services.
@@ -43,7 +43,7 @@ const SHUTDOWN = 5;
  */
 class Kernel implements KernelInterface
 {
-  use EventBroadcasterTrait { emit as protected; }
+  use EventsTrait;
 
   /** @var bool */
   private $devEnv;
