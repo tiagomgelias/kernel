@@ -1,4 +1,5 @@
 <?php
+
 namespace Electro\Kernel\Services;
 
 use Auryn\InjectionException;
@@ -11,7 +12,6 @@ use Electro\Interop\MigrationStruct;
 use Electro\Kernel\Config\KernelSettings;
 use Electro\Kernel\Lib\ModuleInfo;
 use Electro\Lib\JsonFile;
-use PhpKit\ExtPDO\Connection;
 use PhpKit\Flow\FilesystemFlow;
 use SplFileInfo;
 
@@ -311,11 +311,9 @@ class ModulesInstaller
       $module = $this->registry->getModule ($module);
 
     if ($migrate) {
-      $databaseIsAvailable = Connection::getFromEnviroment ()->isAvailable ();
-      $migrationsAPI       = $this->getMigrationsAPI ();
-      $runMigrations       = $databaseIsAvailable && $migrationsAPI;
+      $migrationsAPI = $this->getMigrationsAPI ();
 
-      if ($runMigrations)
+      if ($migrationsAPI && $migrationsAPI->databaseIsAvailable ())
         $this->updateMigrationsOf ($module);
     }
   }
