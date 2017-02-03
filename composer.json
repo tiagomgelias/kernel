@@ -22,7 +22,7 @@
     "php-kit/composer-bower-plugin": "^1.2.0",
     "php-kit/flow": "^1.0.0",
     "php-kit/ext-pdo": "^1.0.0",
-    "php-kit/tools": "^1.0.0",
+    "php-kit/tools": "^2.0.0",
     "rdlowrey/auryn": "^1.4.0"
   },
   "autoload": {
