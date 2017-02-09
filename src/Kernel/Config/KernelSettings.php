@@ -123,7 +123,7 @@ class KernelSettings
    *
    * @var String
    */
-  public $pluginModulesPath = 'private/plugins';
+  public $pluginsPath = 'private/plugins';
   /**
    * @var string The file path of a router script for the build-in PHP web server.
    */

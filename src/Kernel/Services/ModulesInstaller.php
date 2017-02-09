@@ -435,7 +435,7 @@ class ModulesInstaller
   {
     try {
       return FilesystemFlow
-        ::from ("{$this->kernelSettings->baseDirectory}/{$this->kernelSettings->pluginModulesPath}")
+        ::from ("{$this->kernelSettings->baseDirectory}/{$this->kernelSettings->pluginsPath}")
         ->onlyDirectories ()
         ->expand (function (SplFileInfo $dirInfo) {
           return FilesystemFlow
