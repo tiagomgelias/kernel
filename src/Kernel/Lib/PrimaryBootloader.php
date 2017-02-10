@@ -1,4 +1,5 @@
 <?php
+
 namespace Electro\Kernel\Lib;
 
 use Electro\ConsoleApplication\ConsoleApplication;
@@ -7,6 +8,7 @@ use Electro\Interfaces\DI\InjectorInterface;
 use Electro\Interfaces\KernelInterface;
 use Electro\Interfaces\ProfileInterface;
 use Electro\Profiles\ConsoleProfile;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * A class that implements the application's initial bootstrapping sequence, which sets everything else in motion.
@@ -70,7 +72,7 @@ class PrimaryBootloader
   {
     return static::runCommand ('init', [], $event);
   }
-
+  
   /**
    * @internal
    * This is called by Composer on the `pre-package-uninstall` event.
@@ -88,6 +90,7 @@ class PrimaryBootloader
    * @internal
    * This is called by Composer on the `post-update` event.
    *
+   * @param Composer\Script\PackageEvent $event
    * @return int
    */
   static function runUpdateCommand ($event)
