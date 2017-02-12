@@ -1,8 +1,10 @@
 <?php
+
 namespace Electro\Kernel\Services;
 
 use Electro\Kernel\Config\KernelSettings;
 use Electro\Kernel\Lib\ModuleInfo;
+use Electro\Lib\ComposerConfigHandler;
 use Electro\Lib\JsonFile;
 use Electro\Traits\InspectionTrait;
 
@@ -264,6 +266,21 @@ class ModulesRegistry
   function onlyPlugins ()
   {
     $this->moduleFilters[] = function (ModuleInfo $module) { return $module->type == ModuleInfo::TYPE_PLUGIN; };
+    return $this;
+  }
+
+  /**
+   * Adds a condition for module retrieval.
+   *
+   * @return $this
+   */
+  function onlyPluginsRequiredByModules ()
+  {
+    $composerCfg           = new ComposerConfigHandler;
+    $required              = $composerCfg->get ('require');
+    $this->moduleFilters[] = function (ModuleInfo $module) use ($required) {
+      return $module->type == ModuleInfo::TYPE_PLUGIN && isset($required[$module->name]);
+    };
     return $this;
   }
 
