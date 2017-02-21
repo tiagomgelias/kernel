@@ -1,4 +1,5 @@
 <?php
+
 namespace Electro\DependencyInjection;
 
 use Auryn\InjectionException;
@@ -46,8 +47,14 @@ class Injector extends Auryn implements InjectorInterface, \ArrayAccess
 
   public function make ($name, array $args = [])
   {
-    if (isset($this->map[$name]))
-      $name = $this->map[$name];
+    try {
+      if (isset($this->map[$name]))
+        $name = $this->map[$name];
+    }
+    catch (\ErrorException $e) {
+      throw new \InvalidArgumentException(sprintf ('Invalid argument type for the injectable\'s name; string expected',
+        typeOf ($name)));
+    }
     return parent::make ($name, $args);
   }
 
