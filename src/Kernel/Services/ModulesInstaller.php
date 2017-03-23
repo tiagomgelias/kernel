@@ -65,109 +65,6 @@ class ModulesInstaller
   }
 
   /**
-   * @param ModuleInfo[] $modules
-   * @return string[]
-   */
-  static private function getNames (array $modules)
-  {
-    return map ($modules, function (ModuleInfo $module) { return $module->name; });
-  }
-
-  /**
-   * @param string[]     $names
-   * @param ModuleInfo[] $modules
-   * @return ModuleInfo[]
-   */
-  static private function getOnly (array $names, array $modules)
-  {
-    return map ($names, function ($name) use ($modules) {
-      list ($module, $i) = array_find ($modules, 'name', $name);
-      if (!$module) throw new \RuntimeException ("Module not found: $name");
-      return $module;
-    });
-  }
-
-  /**
-   * Brings modules with higer priority to the front of the list, keeping the same order as much as possible.
-   *
-   * @param ModuleInfo[]   $modules
-   * @return ModuleInfo[]
-   */
-  static private function modulesPrioritySort (array $modules)
-  {
-    $max = 0;
-    foreach ($modules as $l)
-      if ($l->priority > $max)
-        $max = $l->priority;
-
-    $o = [];
-    while ($max >= 0) {
-      foreach ($modules as $l)
-        if ($l->priority == $max)
-          $o[] = $l;
-      --$max;
-    }
-
-    return $o;
-  }
-
-  /**
-   * @param ModuleInfo[] $modules
-   * @return ModuleInfo[]
-   * @throws ConfigException
-   */
-  static private function modulesTopologicalSort (array $modules)
-  {
-    /** @var ModuleInfo[] $A All modules, indexed by name */
-    $A = [];
-    /** @var ModuleInfo[] $L The sorted list to be returned */
-    $L = [];
-    foreach ($modules as $module) {
-      $A[$module->name] = $module;
-      $module->tmp      = $module->requiredBy; // tmp is a temporary scratch list
-    }
-
-    /** @var ModuleInfo[] $S Set of all modules not dependend upon */
-    $S = filter ($modules, function (ModuleInfo $m) { return !$m->requiredBy; }, true);
-    while ($S) {
-      $n = array_pop ($S);
-      array_unshift ($L, $n);
-      foreach ($n->dependencies as $name) {
-        $m = get ($A, $name);
-        if ($m && in_array ($n->name, $m->tmp)) {
-          $m->tmp = array_diff ($m->tmp, [$n->name]);
-          if (!$m->tmp)
-            $S[] = $m;
-        }
-      }
-    }
-    foreach ($modules as $m) {
-      if (isset($m->tmp) && $m->tmp)
-        throw new ConfigException(sprintf ('Cyclic dependency between modules: "%s" <-> "%s"', $m->name,
-          implode ('" <-> "', $m->tmp)));
-      unset ($m->tmp);
-    }
-
-    return $L;
-  }
-
-  /**
-   * Sorts modules by the order they should be loaded, according to their dependencies.
-   *
-   * @param ModuleInfo[] $modules
-   */
-  static private function sortModules (array &$modules)
-  {
-    $types = [];
-    foreach ($modules as $m)
-      $types[ModuleInfo::TYPE_PRIORITY[$m->type]][] = $m;
-    foreach ($types as &$t)
-      $t = self::modulesTopologicalSort ($t);
-    $modules = array_merge (...$types);
-    $modules = self::modulesPrioritySort ($modules);
-  }
-
-  /**
    * Performs uninstallation clean up tasks before the module is actually uninstalled.
    *
    * @param string $moduleName
@@ -206,6 +103,23 @@ class ModulesInstaller
   public function end ()
   {
     $this->io->nl ();
+  }
+
+  /**
+   * Gets a list of pending migrations for the specified module, or an empty list if the module has no migrations at
+   * all.
+   *
+   * @param string $moduleName
+   * @return array List of {@see MigrationStruct}
+   */
+  function getMigrationsOf ($moduleName)
+  {
+    $migrationsAPI = $this->getMigrationsAPI ();
+
+    if ($migrationsAPI && $migrationsAPI->databaseIsAvailable ())
+      return $migrationsAPI->module ($moduleName)->status ();
+
+    return [];
   }
 
   /**
@@ -310,12 +224,8 @@ class ModulesInstaller
     if (is_string ($module))
       $module = $this->registry->getModule ($module);
 
-    if ($migrate) {
-      $migrationsAPI = $this->getMigrationsAPI ();
-
-      if ($migrationsAPI && $migrationsAPI->databaseIsAvailable ())
-        $this->updateMigrationsOf ($module);
-    }
+    if ($migrate)
+      $this->updateMigrationsOf ($module->name);
   }
 
   /**
@@ -339,6 +249,109 @@ class ModulesInstaller
   }
 
   /**
+   * @param ModuleInfo[] $modules
+   * @return string[]
+   */
+  static private function getNames (array $modules)
+  {
+    return map ($modules, function (ModuleInfo $module) { return $module->name; });
+  }
+
+  /**
+   * @param string[]     $names
+   * @param ModuleInfo[] $modules
+   * @return ModuleInfo[]
+   */
+  static private function getOnly (array $names, array $modules)
+  {
+    return map ($names, function ($name) use ($modules) {
+      list ($module, $i) = array_find ($modules, 'name', $name);
+      if (!$module) throw new \RuntimeException ("Module not found: $name");
+      return $module;
+    });
+  }
+
+  /**
+   * Brings modules with higer priority to the front of the list, keeping the same order as much as possible.
+   *
+   * @param ModuleInfo[]   $modules
+   * @return ModuleInfo[]
+   */
+  static private function modulesPrioritySort (array $modules)
+  {
+    $max = 0;
+    foreach ($modules as $l)
+      if ($l->priority > $max)
+        $max = $l->priority;
+
+    $o = [];
+    while ($max >= 0) {
+      foreach ($modules as $l)
+        if ($l->priority == $max)
+          $o[] = $l;
+      --$max;
+    }
+
+    return $o;
+  }
+
+  /**
+   * @param ModuleInfo[] $modules
+   * @return ModuleInfo[]
+   * @throws ConfigException
+   */
+  static private function modulesTopologicalSort (array $modules)
+  {
+    /** @var ModuleInfo[] $A All modules, indexed by name */
+    $A = [];
+    /** @var ModuleInfo[] $L The sorted list to be returned */
+    $L = [];
+    foreach ($modules as $module) {
+      $A[$module->name] = $module;
+      $module->tmp      = $module->requiredBy; // tmp is a temporary scratch list
+    }
+
+    /** @var ModuleInfo[] $S Set of all modules not dependend upon */
+    $S = filter ($modules, function (ModuleInfo $m) { return !$m->requiredBy; }, true);
+    while ($S) {
+      $n = array_pop ($S);
+      array_unshift ($L, $n);
+      foreach ($n->dependencies as $name) {
+        $m = get ($A, $name);
+        if ($m && in_array ($n->name, $m->tmp)) {
+          $m->tmp = array_diff ($m->tmp, [$n->name]);
+          if (!$m->tmp)
+            $S[] = $m;
+        }
+      }
+    }
+    foreach ($modules as $m) {
+      if (isset($m->tmp) && $m->tmp)
+        throw new ConfigException(sprintf ('Cyclic dependency between modules: "%s" <-> "%s"', $m->name,
+          implode ('" <-> "', $m->tmp)));
+      unset ($m->tmp);
+    }
+
+    return $L;
+  }
+
+  /**
+   * Sorts modules by the order they should be loaded, according to their dependencies.
+   *
+   * @param ModuleInfo[] $modules
+   */
+  static private function sortModules (array &$modules)
+  {
+    $types = [];
+    foreach ($modules as $m)
+      $types[ModuleInfo::TYPE_PRIORITY[$m->type]][] = $m;
+    foreach ($types as &$t)
+      $t = self::modulesTopologicalSort ($t);
+    $modules = array_merge (...$types);
+    $modules = self::modulesPrioritySort ($modules);
+  }
+
+  /**
    * Deletes the currently generated bootloaders for all profiles.
    */
   private function clearBootloaders ()
@@ -348,6 +361,16 @@ class ModulesInstaller
       rrmdir ($path);
     mkdir ("{$this->kernelSettings->baseDirectory}/$path");
   }
+
+//  private function getSubsystemsOfProfile ()
+//  {
+//    return map ($this->profile->getSubsystems (), function ($moduleName) {
+//      return (new ModuleInfo)->import ([
+//        'name' => $moduleName,
+//        'path' => "{$this->kernelSettings->frameworkPath}/subsystems/$moduleName",
+//      ]);
+//    });
+//  }
 
   /**
    * @return MigrationsInterface
@@ -362,16 +385,6 @@ class ModulesInstaller
       return null;
     }
   }
-
-//  private function getSubsystemsOfProfile ()
-//  {
-//    return map ($this->profile->getSubsystems (), function ($moduleName) {
-//      return (new ModuleInfo)->import ([
-//        'name' => $moduleName,
-//        'path' => "{$this->kernelSettings->frameworkPath}/subsystems/$moduleName",
-//      ]);
-//    });
-//  }
 
   private function loadModuleMetadata (ModuleInfo $module)
   {
@@ -525,25 +538,25 @@ class ModulesInstaller
         rrmdir ($dir);
   }
 
-  private function updateMigrationsOf (ModuleInfo $module)
+  private function updateMigrationsOf ($moduleName)
   {
-    $migrationsAPI = $this->getMigrationsAPI ();
-    $migrations    = $migrationsAPI->module ($module->name)->status ();
+    $migrations = $this->getMigrationsOf ($moduleName);
     if ($migrations) {
       $io = $this->io;
-      $io->comment ("    Module <info>$module->name</info> has migrations.");
+      $io->comment ("    Module <info>$moduleName</info> has migrations.");
       $migrations = array_findAll ($migrations, MigrationStruct::status, MigrationStruct::PENDING);
       if ($migrations) {
         $io->say ("    Updating the database...");
         try {
-          $migrationsAPI->migrate ($module->name);
+          $migrationsAPI = $this->getMigrationsAPI ();
+          $migrationsAPI->module ($moduleName)->migrate ();
         }
         catch (\Exception $e) {
           $io->error ("Error while migrating: " . $e->getMessage ());
         }
         $io->say ("    <info>Done.</info>")->nl ();
       }
-      else $io->comment ("    No new migrations to run.");
+      else $io->comment ("    No new migrations to run.")->nl ();
     }
   }
 
