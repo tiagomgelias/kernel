@@ -265,7 +265,7 @@ class ModulesInstaller
   static private function getOnly (array $names, array $modules)
   {
     return map ($names, function ($name) use ($modules) {
-      list ($module, $i) = array_find ($modules, 'name', $name);
+      $module = array_find ($modules, 'name', $name);
       if (!$module) throw new \RuntimeException ("Module not found: $name");
       return $module;
     });
