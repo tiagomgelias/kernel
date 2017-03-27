@@ -106,7 +106,7 @@ class ModulesInstaller
   }
 
   /**
-   * Gets a list of pending migrations for the specified module, or an empty list if the module has no migrations at
+   * Gets a list of all migrations for the specified module, or an empty list if the module has no migrations at
    * all.
    *
    * @param string $moduleName
@@ -543,20 +543,24 @@ class ModulesInstaller
     $migrations = $this->getMigrationsOf ($moduleName);
     if ($migrations) {
       $io = $this->io;
-      $io->comment ("    Module <info>$moduleName</info> has migrations.");
+      $io->indent (4)->comment ("Module <info>$moduleName</info> has migrations");
       $migrations = array_findAll ($migrations, MigrationStruct::status, MigrationStruct::PENDING);
       if ($migrations) {
-        $io->say ("    Updating the database...");
+        $count = count ($migrations);
+        $io->say ("Running <info>$count</info> " . simplePluralize ($count, 'migration'));
         try {
           $migrationsAPI = $this->getMigrationsAPI ();
-          $migrationsAPI->module ($moduleName)->migrate ();
+          $count         = $migrationsAPI->module ($moduleName)->migrate ();
+          if (!$count)
+            $io->say ("<error>Migration failed</error>");
         }
         catch (\Exception $e) {
           $io->error ("Error while migrating: " . $e->getMessage ());
         }
-        $io->say ("    <info>Done.</info>")->nl ();
+        $io->say ("<info>Done.</info>")->nl ();
       }
-      else $io->comment ("    No new migrations to run.")->nl ();
+      else $io->comment ("No new migrations to run")->nl ();
+      $io->indent (0);
     }
   }
 
