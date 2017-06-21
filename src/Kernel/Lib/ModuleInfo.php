@@ -148,7 +148,7 @@ class ModuleInfo implements AssignableInterface
   /**
    * Retrieve the module's PHP namespace from its composer.json (if present).
    *
-   * @param string $srcPath The argument gets assigned the source code path associated with the found namespace.
+   * @param string $srcPath [output] This argument is assigned the source code path associated with the found namespace.
    * @return null|string `null` if no composer.json is available.
    * @throws \Exception If the module's composer.json is not a valid module config.
    */
