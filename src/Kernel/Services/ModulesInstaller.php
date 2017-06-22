@@ -393,9 +393,9 @@ class ModulesInstaller
       $bootstrapperPath    = $module->getBootstrapperPath ();
       if ($bootstrapperPath) {
         if (file_exists ($bootstrapperPath))
-          $module->bootstrapper = $module->getNamespace () . '/' . $module->getBootstrapperClass ();
+          $module->bootstrapper = $module->getNamespace () . '\\' . $module->getBootstrapperClass ();
       }
-      $module->dependencies = array_diff (object_propNames ($composerJson->get ('require') ?: (object)[]), ['php']);
+      $module->dependencies = array_diff (array_keys ($composerJson->get ('require', [])), ['php']);
       $module->priority     = $composerJson->get ('extra.boot-priority', 0);
     }
     $rp = realpath ($module->path);

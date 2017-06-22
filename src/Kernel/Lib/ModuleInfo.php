@@ -60,7 +60,7 @@ class ModuleInfo implements AssignableInterface
   /**
    * A Unique Identifier for the module.
    * Plugins and Project Modules have names with 'vendor-name/package-name' syntax.
-   * Subsystems have names with syntax: 'module-name'.
+   * Subsystems have names with syntax: 'subsystems/module-name'.
    *
    * @var string
    */
