@@ -11,7 +11,6 @@ use Electro\Interfaces\ProfileInterface;
 use Electro\Interop\MigrationStruct;
 use Electro\Kernel\Config\KernelSettings;
 use Electro\Kernel\Lib\ModuleInfo;
-use Electro\Lib\JsonFile;
 use PhpKit\Flow\FilesystemFlow;
 use SplFileInfo;
 
@@ -388,27 +387,20 @@ class ModulesInstaller
 
   private function loadModuleMetadata (ModuleInfo $module)
   {
-    $composerJson = new JsonFile ("$module->path/composer.json");
-    if ($composerJson->exists ()) {
-      $composerJson->load ();
+    $composerJson = $module->getComposerConfig ();
+    if ($composerJson) {
       $module->description = $composerJson->get ('description');
-      $namespaces          = $composerJson->get ('autoload.psr-4');
-      if ($namespaces) {
-        $firstKey     = array_keys (get_object_vars ($namespaces))[0];
-        $folder       = $namespaces->$firstKey;
-        $bootstrapper = $module->getBootstrapperClass ();
-        $filename     = str_replace ('\\', '/', $bootstrapper);
-        $servicesPath = "$module->path/$folder/$filename.php";
-        if (file_exists ($servicesPath))
-          $module->bootstrapper = "$firstKey$bootstrapper";
-        $rp = realpath ($module->path);
-        if ($rp != "{$this->kernelSettings->baseDirectory}/$module->path")
-          $module->realPath = $rp;
-
-        $module->dependencies = array_diff (object_propNames ($composerJson->get ('require') ?: (object)[]), ['php']);
-        $module->priority     = $composerJson->get ('extra.boot-priority', 0);
+      $bootstrapperPath    = $module->getBootstrapperPath ();
+      if ($bootstrapperPath) {
+        if (file_exists ($bootstrapperPath))
+          $module->bootstrapper = $module->getNamespace () . '/' . $module->getBootstrapperClass ();
       }
+      $module->dependencies = array_diff (object_propNames ($composerJson->get ('require') ?: (object)[]), ['php']);
+      $module->priority     = $composerJson->get ('extra.boot-priority', 0);
     }
+    $rp = realpath ($module->path);
+    if ($rp != "{$this->kernelSettings->baseDirectory}/$module->path")
+      $module->realPath = $rp;
   }
 
   /**

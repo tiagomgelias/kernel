@@ -124,13 +124,33 @@ class ModuleInfo implements AssignableInterface
   }
 
   /**
-   * Returns this module's bootstrapper class name.
+   * Returns this module's bootstrapper class name, with a relative namespace from the module's base namespace.
    *
    * @return string
    */
   function getBootstrapperClass ()
   {
     return sprintf (self::BOOTSTRAPPER_CLASS_NAME_FMT, $this->getShortName ());
+  }
+
+  /**
+   * Computes the filesystem path of the module's bootstrapper class.
+   *
+   * <p>**Note:** the actual file may or may not exist.
+   *
+   * @return null|string If NULL, no PSR-4 namespace is registered for the module.
+   */
+  function getBootstrapperPath ()
+  {
+    $namespaces = $this->getComposerConfig ()->get ('autoload.psr-4');
+    if ($namespaces) {
+      $firstKey     = array_keys ($namespaces)[0];
+      $folder       = $namespaces[$firstKey];
+      $bootstrapper = $this->getBootstrapperClass ();
+      $filename     = str_replace ('\\', '/', $bootstrapper);
+      return "$this->path/$folder/$filename.php";
+    }
+    return null;
   }
 
   /**
