@@ -28,7 +28,7 @@ class ComposerConfigHandler extends JsonFile
    * @param string $version
    * @return $this
    */
-  function require ($package, $version)
+  function requirePackage ($package, $version)
   {
     $require           = $this->get ('require', []);
     $require[$package] = $version;
@@ -42,7 +42,7 @@ class ComposerConfigHandler extends JsonFile
    * @param string $moduleName
    * @return $this
    */
-  function unrequire ($moduleName)
+  function unrequirePackage ($moduleName)
   {
     $require = $this->get ('require', []);
     unset ($require[$moduleName]);
