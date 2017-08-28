@@ -50,6 +50,8 @@ class JsonFile
   {
     $json       = loadFile ($this->path, $this->useIncludePath);
     $this->data = $json ? json_decode ($json, $this->assoc) : false;
+    if (is_null ($this->data))
+      throw new \RuntimeException("Error on <path>$this->path</path>: " . json_last_error_msg ());
     return $this;
   }
 
