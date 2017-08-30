@@ -58,7 +58,7 @@ class ModulesRegistry
    */
   static public function validateModuleName ($name)
   {
-    return (bool)preg_match ('#^[a-z0-9\-]+/[a-z0-9\-]+$#', $name);
+    return (bool)preg_match ('#^[a-z0-9\-_]+/[a-z0-9\-_]+$#', $name);
   }
 
   static private function hidrateModulesList (array $data)
