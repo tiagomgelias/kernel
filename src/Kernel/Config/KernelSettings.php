@@ -125,6 +125,12 @@ class KernelSettings
    */
   public $pluginsPath = 'private/plugins';
   /**
+   * The name of remember me token
+   *
+   * @var string
+   */
+  public $rememberMeTokenName = "rememberMe";
+  /**
    * @var string The file path of a router script for the build-in PHP web server.
    */
   public $routerFile = 'private/packages/electro/framework/devServerRouter.php';
